@@ -127,7 +127,6 @@ export const stihlProducts = {
       id: "trimmers",
       name: "Grass Trimmers and Brushcutters",
       products: [
-        { id: "fr230", name: "FR 230", image: assets.fr230, description: "Powerful brushcutter for tough weeds and dense vegetation." },
         { id: "fs3001", name: "FS 3001", image: assets.fs3001, description: "High-performance brushcutter for professional landscaping tasks." },
         { id: "fs230", name: "FS 230", image: assets.fs230, description: "Versatile brushcutter for heavy-duty grass and weed clearing." },
       ]
