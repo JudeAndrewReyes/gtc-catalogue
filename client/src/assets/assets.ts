@@ -15,9 +15,8 @@ import ms182 from './ms182.png';
 import ms162 from './ms162.png';
 import ms212 from './ms212.png';
 import ms250 from './ms250.jpg';
-import fr230 from './fr230.png';
 import fs3001 from './fs3001.png';
-import fs230 from './fs230.png';
+import fs230 from './fs230.jpg';
 
 const assets = {
     logo,
@@ -37,7 +36,6 @@ const assets = {
     ms162,
     ms212,
     ms250,
-    fr230,
     fs3001,
     fs230,
 };
