@@ -1,18 +1,25 @@
+import { Link } from 'react-router-dom';
 import { brands } from '../data/data.ts';
 
 const Brands = () => {
+  const featuredBrands = brands.filter(
+    (brand) => brand.featured
+  );
+
   return (
-    <section className="pt-15 py-16 bg-white text-center" id='Brands'>
+    <section className="py-16 bg-white text-center" id='Brands'>
         <h2 className="text-4xl font-bold text-gray-800 mb-4">
             Premium Equipment Brands
         </h2>
         <p className="text-xl text-gray-600">Professional Tools & Equipment Solutions</p>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
-          {brands.map((brand) => (
-            <div 
+          {featuredBrands.map((brand) => (
+            <Link 
               key={brand.id} 
+              to={`/${brand.id}`}
               className="brand-item flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:transform hover:scale-105 transition-transform duration-200"
+              aria-label={`View details for ${brand.name}`}
             >
               <img 
                 src={brand.logo} 
@@ -33,7 +40,7 @@ const Brands = () => {
                   Featured
                 </span>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -41,4 +48,4 @@ const Brands = () => {
   )
 }
 
-export default Brands
+export default Brands;
