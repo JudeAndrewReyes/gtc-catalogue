@@ -14,16 +14,16 @@ import rexel_logo from './rexel_logo.png';
 import ms182 from './ms182.png';
 import ms162 from './ms162.png';
 import ms212 from './ms212.png';
-import ms250 from './ms250.png';
-import ms230 from './ms230.png';
-import stihl070 from './stihl070.png';
-import ms651 from './ms651.png';
-import ms462 from './ms462.png';
+import ms250 from './ms250.jpg';
+// import ms230 from './ms230.png';
+// import stihl070 from './stihl070.png';
+// import ms651 from './ms651.png';
+// import ms462 from './ms462.png';
 import fr230 from './fr230.png';
 import fs3001 from './fs3001.png';
 import fs230 from './fs230.png';
-import fr230b from './fr230b.png';
-import fs460 from './fs460.png';
+// import fr230b from './fr230b.png';
+// import fs460 from './fs460.png';
 
 const assets = {
     logo,
@@ -43,15 +43,15 @@ const assets = {
     ms162,
     ms212,
     ms250,
-    ms230,
-    stihl070,
-    ms651,
-    ms462,
+    // ms230,
+    // stihl070,
+    // ms651,
+    // ms462,
     fr230,
     fs3001,
     fs230,
-    fr230b,
-    fs460
+    // fr230b,
+    // fs460
 };
 
 export default assets;
