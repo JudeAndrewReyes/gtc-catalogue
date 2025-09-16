@@ -1,42 +1,41 @@
-import { Link } from 'react-router-dom';
-import { brands } from '../data/data.ts';
+import { Link } from "react-router-dom";
+import { brands } from "../data/data.ts";
 
 const Brands = () => {
-  const featuredBrands = brands.filter(
-    (brand) => brand.featured
-  );
+  const featuredBrands = brands.filter((brand) => brand.featured);
 
   return (
-    <section className="py-16 bg-white text-center" id='Brands'>
-        <h2 className="text-4xl font-bold text-gray-800 mb-4">
+    <section className="py-20 mb-16 bg-white text-center" id="Brands">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div>
+          <h2 className="text-4xl font-bold text-gray-800">
             Premium Equipment Brands
-        </h2>
-        <p className="text-xl text-gray-600">Professional Tools & Equipment Solutions</p>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
+          </h2>
+          <p className="text-lg text-gray-600">
+            Professional Tools & Equipment Solutions
+          </p>
+        </div>
+
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2">
           {featuredBrands.map((brand) => (
-            <Link 
-              key={brand.id} 
+            <Link
+              key={brand.id}
               to={`/${brand.id}`}
-              className="brand-item flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:transform hover:scale-105 transition-transform duration-200"
+              className="flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:scale-105 transition-transform duration-200 shadow-sm hover:shadow-md"
               aria-label={`View details for ${brand.name}`}
             >
-              <img 
-                src={brand.logo} 
-                alt={`${brand.name} logo`} 
-                className="h-20 rounded mb-4 object-contain"
+              <img
+                src={brand.logo}
+                alt={`${brand.name} logo`}
+                className="h-20 mb-4 object-contain"
               />
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800">
                 {brand.name}
               </h3>
-              <p className="text-gray-600 text-center mb-2">
-                {brand.description}
-              </p>
-              <p className="text-gray-500 text-sm mb-2">
-                Since: {brand.since}
-              </p>
+              <p className="text-sm text-gray-600">{brand.description}</p>
+              <p className="text-xs text-gray-500">Since {brand.since}</p>
               {brand.featured && (
-                <span className="featured-badge inline-block bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded">
+                <span className="mt-3 inline-block bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded">
                   Featured
                 </span>
               )}
@@ -45,7 +44,7 @@ const Brands = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default Brands;

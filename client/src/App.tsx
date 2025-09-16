@@ -6,6 +6,7 @@ import BrandPage from './components/BrandPage';
 import { QuoteFormProvider, useQuoteFormContext } from "./hooks/useQuoteForm.context";
 import QuoteForm from './components/QuoteForm';
 import Partnerships from './components/Partnerships';
+import Footer from './components/Footer';
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
                 <About />
                 <Brands />
                 <Partnerships />
+                <Footer />
               </>
             }
           />
