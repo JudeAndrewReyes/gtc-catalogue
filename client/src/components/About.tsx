@@ -13,7 +13,7 @@ export default function About() {
             alt="Gensson Logo"
             className="w-50 h-50 rounded-full shadow-md"
           />
-          <div className="space-y-2 text-gray-700">
+          <div className="space-y-2 lg:text-2xl text-gray-700">
             <p className="font-medium">National Procurement</p>
             <p className="font-medium">Partner Solutions</p>
             <p className="font-medium">Trusted Network</p>
@@ -25,7 +25,7 @@ export default function About() {
             Professional Equipment
             <span className="text-red-500 block">Sourcing</span>
           </h1>
-          <p className="font-medium text-gray-700">
+          <p className="font-medium text-lg text-gray-700">
             We help contractors, builders, and businesses source premium equipment with trusted brands like STIHL.
           </p>
 

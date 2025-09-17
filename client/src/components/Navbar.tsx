@@ -59,7 +59,7 @@ const Navbar = () => {
                 {/* Navigation Links */}
                 <nav>
                     {/* Desktop Navigation - Hidden on mobile */}
-                    <ul className="hidden md:flex gap-6 items-center text-sm font-medium">
+                    <ul className="hidden md:flex gap-6 items-center text-sm lg:text-lg font-medium">
                         <li>
                             <a href="#About"
                                 onClick={(e) => handleScroll(e, "About")}
