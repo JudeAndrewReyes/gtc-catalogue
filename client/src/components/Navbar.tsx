@@ -15,6 +15,22 @@ const Navbar = () => {
         }
     }, [showMobileMenu]);
 
+    // Function to handle smooth scrolling with offset
+    const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+        e.preventDefault();
+        const navbar = document.querySelector("nav");
+        const navbarHeight = navbar ? navbar.offsetHeight : 100; // Fallback to 80px if null
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({
+            top: elementPosition - navbarHeight,
+            behavior: "smooth",
+        });
+        }
+        setShowMobileMenu(false); // Close mobile menu if open
+    };
+
     return (
         <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-md border-b border-gray-100">
             <div className="max-w-7xl mx-auto flex justify-between items-center py-3 px-6">
@@ -45,13 +61,24 @@ const Navbar = () => {
                     {/* Desktop Navigation - Hidden on mobile */}
                     <ul className="hidden md:flex gap-6 items-center text-sm font-medium">
                         <li>
-                            <a href="#Brands" className="hover:text-red-600 transition-colors">Brands</a>
+                            <a href="#About"
+                                onClick={(e) => handleScroll(e, "About")}
+                                className="hover:text-red-600 transition-colors">About</a>
                         </li>
                         <li>
-                            <a href="#Partnership" className="hover:text-red-600 transition-colors">Partnership</a>
+                            <a href="#Brands" 
+                                onClick={(e) => handleScroll(e, "Brands")}
+                                className="hover:text-red-600 transition-colors">Brands</a>
                         </li>
                         <li>
-                            <a href="#Contact" className="hover:text-red-600 transition-colors">Contact Us</a>
+                            <a href="#Partnership" 
+                                onClick={(e) => handleScroll(e, "Partnership")}
+                                className="hover:text-red-600 transition-colors">Partnership</a>
+                        </li>
+                        <li>
+                            <a href="#Contact"
+                                onClick={(e) => handleScroll(e, "Contact")}
+                                className="hover:text-red-600 transition-colors">Contact Us</a>
                         </li>
                     </ul>
                     

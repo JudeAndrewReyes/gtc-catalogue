@@ -5,7 +5,7 @@ const Brands = () => {
   const featuredBrands = brands.filter((brand) => brand.featured);
 
   return (
-    <section className="py-20 mb-16 bg-white text-center" id="Brands">
+    <section className="py-20 bg-white text-center" id="Brands">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div>
           <h2 className="text-4xl font-bold text-gray-800">

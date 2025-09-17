@@ -393,17 +393,17 @@ Example: 'Need 10 STIHL chainsaws MS 250, 5 cordless drills, safety equipment fo
             <button 
               type="submit"
               disabled={isLoading}
-              className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="animate-spin mr-2" size={16} />
-                  SENDING...
+                  <Loader2 className="animate-spin mb-1" size={16} />
+                  <span>SENDING...</span>
                 </>
               ) : (
                 <>
-                  SUBMIT REQUEST
-                  <div className="text-sm text-orange-100 mt-1">Response within 24 hours</div>
+                  <span>SUBMIT REQUEST</span>
+                  <span className="text-sm text-orange-100 mt-1">Response within 24 hours</span>
                 </>
               )}
             </button>
