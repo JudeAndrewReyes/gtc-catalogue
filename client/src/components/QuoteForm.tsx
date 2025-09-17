@@ -36,6 +36,14 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { sendEmail, isLoading, error, success } = useEmail();
 
+  // Debug: Log environment variables when component mounts
+  console.log('QuoteForm - Environment check:', {
+    serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+    templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+    mode: import.meta.env.MODE
+  });
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget && !isLoading) {
       onClose();
@@ -121,7 +129,7 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
         onClose();
       }, 2000);
     } catch (err) {
-      // Error is handled by the useEmail hook
+      // Error is handled by the useEmail hook, but let's log it for debugging
       console.error('Error submitting form:', err);
     }
   };
