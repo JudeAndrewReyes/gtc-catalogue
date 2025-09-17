@@ -30,7 +30,22 @@ export const useEmail = (): UseEmailReturn => {
     setError(null);
     setSuccess(false);
 
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
     try {
+      // Debug: Log the actual values (remove this after testing)
+      console.log('Environment Variables:', {
+        serviceId,
+        templateId, 
+        publicKey: publicKey ? publicKey.substring(0, 5) + '...' : 'Missing'
+      });
+
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error('EmailJS configuration is missing. Please check your environment variables.');
+      }
+
       // Format project types for email
       const formattedProjectTypes = templateParams.projectTypes.join(', ');
       
@@ -49,16 +64,28 @@ export const useEmail = (): UseEmailReturn => {
         })
       };
 
-      await emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        emailParams,
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      );
+      console.log('Sending email with params:', emailParams);
+      
+      await emailjs.send(serviceId, templateId, emailParams, publicKey);
 
       setSuccess(true);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send email. Please try again.';
+      console.error('EmailJS Error Details:', err);
+      
+      let errorMessage = 'Failed to send email. Please try again.';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        console.error('Error message:', err.message);
+      }
+      
+      // Log configuration for debugging
+      console.log('EmailJS Configuration Check:', {
+        serviceId: serviceId ? 'Set' : 'Missing',
+        templateId: templateId ? 'Set' : 'Missing',
+        publicKey: publicKey ? 'Set' : 'Missing'
+      });
+      
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
