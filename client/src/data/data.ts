@@ -81,16 +81,7 @@ export const brands = [
     featured: false,
     partnership: false,
     since: 2019,
-  },
-  {
-    id: "rexel",
-    name: "Rexel",
-    logo: assets.rexel_logo,
-    description: "Distributor of electrical supplies and automation solutions",
-    featured: false,
-    partnership: false,
-    since: 2022,
-  },
+  }
 ];
 
 

@@ -1,18 +1,136 @@
-import { X, Phone } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { X, Phone, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { useEmail, type EmailTemplateParams } from '../hooks/useEmail';
 
 interface QuoteFormProps {
   readonly isOpen: boolean;
   readonly onClose: () => void;
 }
 
+interface FormData {
+  contactName: string;
+  company: string;
+  email: string;
+  phone: string;
+  projectTypes: string[];
+  otherProjectType: string;
+  equipmentNeeded: string;
+  budgetRange: string;
+  deliveryLocation: string;
+}
+
+const initialFormData: FormData = {
+  contactName: '',
+  company: '',
+  email: '',
+  phone: '',
+  projectTypes: [],
+  otherProjectType: '',
+  equipmentNeeded: '',
+  budgetRange: '',
+  deliveryLocation: ''
+};
+
 export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
-  if (!isOpen) return null;
+  const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const { sendEmail, isLoading, error, success } = useEmail();
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && !isLoading) {
       onClose();
     }
   };
+
+  const handleInputChange = useCallback((
+    field: keyof FormData,
+    value: string
+  ) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  }, [validationErrors]);
+
+  const handleProjectTypeChange = useCallback((
+    projectType: string,
+    checked: boolean
+  ) => {
+    setFormData(prev => ({
+      ...prev,
+      projectTypes: checked
+        ? [...prev.projectTypes, projectType]
+        : prev.projectTypes.filter(type => type !== projectType)
+    }));
+  }, []);
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.contactName.trim()) {
+      errors.contactName = 'Contact name is required';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.equipmentNeeded.trim()) {
+      errors.equipmentNeeded = 'Equipment details are required';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      const emailParams: EmailTemplateParams = {
+        contactName: formData.contactName,
+        company: formData.company || 'Not specified',
+        email: formData.email,
+        phone: formData.phone || 'Not provided',
+        projectTypes: formData.projectTypes.length > 0 
+          ? [...formData.projectTypes, ...(formData.otherProjectType ? [formData.otherProjectType] : [])]
+          : ['Not specified'],
+        equipmentNeeded: formData.equipmentNeeded,
+        budgetRange: formData.budgetRange || 'Not specified',
+        deliveryLocation: formData.deliveryLocation || 'Not specified'
+      };
+
+      await sendEmail(emailParams);
+      
+      // Reset form after successful submission
+      setFormData(initialFormData);
+      setValidationErrors({});
+      
+      // Auto-close after 2 seconds of showing success
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } catch (err) {
+      // Error is handled by the useEmail hook
+    }
+  };
+
+  const handleCancel = () => {
+    if (!isLoading) {
+      setFormData(initialFormData);
+      setValidationErrors({});
+      onClose();
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -29,12 +147,34 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
           </div>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+            disabled={isLoading}
+            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer disabled:opacity-50">
             <X size={24} />
           </button>
         </div>
 
-        <div className="p-6 space-y-8">
+        {/* Success/Error Messages */}
+        {success && (
+          <div className="mx-6 mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
+            <div className="flex items-center">
+              <CheckCircle2 className="text-green-600 mr-2" size={20} />
+              <span className="text-green-800 font-medium">Quote request sent successfully!</span>
+            </div>
+            <p className="text-green-700 text-sm mt-1">We'll respond within 24 hours.</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex items-center">
+              <AlertCircle className="text-red-600 mr-2" size={20} />
+              <span className="text-red-800 font-medium">Error sending request</span>
+            </div>
+            <p className="text-red-700 text-sm mt-1">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-8">
           {/* Company Information Section */}
           <div className="border border-gray-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">COMPANY INFORMATION</h3>
@@ -46,9 +186,17 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  value={formData.contactName}
+                  onChange={(e) => handleInputChange('contactName', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                    validationErrors.contactName ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                   placeholder="Enter your full name"
+                  disabled={isLoading}
                 />
+                {validationErrors.contactName && (
+                  <p className="text-red-600 text-sm mt-1">{validationErrors.contactName}</p>
+                )}
               </div>
 
               <div>
@@ -57,8 +205,11 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
                 </label>
                 <input
                   type="text"
+                  value={formData.company}
+                  onChange={(e) => handleInputChange('company', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Your company name"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -68,9 +219,17 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
                 </label>
                 <input
                   type="email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                    validationErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                   placeholder="your.email@company.com"
+                  disabled={isLoading}
                 />
+                {validationErrors.email && (
+                  <p className="text-red-600 text-sm mt-1">{validationErrors.email}</p>
+                )}
               </div>
 
               <div>
@@ -79,8 +238,11 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
                 </label>
                 <input
                   type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="+63-XXX-XXX-XXXX"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -96,51 +258,47 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
                 Project Type:
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                  />
-                  <span className="text-sm text-gray-700">Construction Project</span>
-                </label>
-                
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                  />
-                  <span className="text-sm text-gray-700">Manufacturing Setup</span>
-                </label>
-                
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                  />
-                  <span className="text-sm text-gray-700">Facility Maintenance</span>
-                </label>
-                
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                  />
-                  <span className="text-sm text-gray-700">STIHL Equipment Only</span>
-                </label>
+                {[
+                  'Construction Project',
+                  'Manufacturing Setup',
+                  'Facility Maintenance',
+                  'STIHL Equipment Only'
+                ].map((projectType) => (
+                  <label key={projectType} className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.projectTypes.includes(projectType)}
+                      onChange={(e) => handleProjectTypeChange(projectType, e.target.checked)}
+                      className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                      disabled={isLoading}
+                    />
+                    <span className="text-sm text-gray-700">{projectType}</span>
+                  </label>
+                ))}
               </div>
               
               <div className="mt-3 flex items-center">
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
+                    checked={formData.otherProjectType !== ''}
+                    onChange={(e) => {
+                      if (!e.target.checked) {
+                        handleInputChange('otherProjectType', '');
+                      }
+                    }}
                     className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                    disabled={isLoading}
                   />
                   <span className="text-sm mr-2 text-gray-700">Other:</span>
                 </label>
                 <input
                   type="text"
+                  value={formData.otherProjectType}
+                  onChange={(e) => handleInputChange('otherProjectType', e.target.value)}
                   className="flex-1 px-3 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Please specify"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -152,7 +310,11 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
               </label>
               <textarea
                 rows={6}
-                className="w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                value={formData.equipmentNeeded}
+                onChange={(e) => handleInputChange('equipmentNeeded', e.target.value)}
+                className={`w-full px-3 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                  validationErrors.equipmentNeeded ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
                 placeholder="Please describe what you need:
 - Specific tools/equipment
 - Quantities needed  
@@ -160,7 +322,11 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
 - Project timeline
 
 Example: 'Need 10 STIHL chainsaws MS 250, 5 cordless drills, safety equipment for 20 workers'"
+                disabled={isLoading}
               />
+              {validationErrors.equipmentNeeded && (
+                <p className="text-red-600 text-sm mt-1">{validationErrors.equipmentNeeded}</p>
+              )}
             </div>
 
             {/* Budget Range */}
@@ -168,7 +334,12 @@ Example: 'Need 10 STIHL chainsaws MS 250, 5 cordless drills, safety equipment fo
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Budget Range:
               </label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+              <select 
+                value={formData.budgetRange}
+                onChange={(e) => handleInputChange('budgetRange', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                disabled={isLoading}
+              >
                 <option value="">Select Range</option>
                 <option value="under-100k">Under ₱100,000</option>
                 <option value="100k-500k">₱100K-₱500K</option>
@@ -186,25 +357,46 @@ Example: 'Need 10 STIHL chainsaws MS 250, 5 cordless drills, safety equipment fo
               </label>
               <input
                 type="text"
+                value={formData.deliveryLocation}
+                onChange={(e) => handleInputChange('deliveryLocation', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="City, Province"
+                disabled={isLoading}
               />
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-            <button className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+            <button 
+              type="button"
+              onClick={handleCancel}
+              disabled={isLoading}
+              className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               CANCEL
               <div className="text-sm text-gray-500 mt-1">Back to Categories</div>
             </button>
             
-            <button className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors">
-              SUBMIT REQUEST
-              <div className="text-sm text-orange-100 mt-1">Response within 24 hours</div>
+            <button 
+              type="submit"
+              disabled={isLoading}
+              className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin mr-2" size={16} />
+                  SENDING...
+                </>
+              ) : (
+                <button className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors">
+                  SUBMIT REQUEST
+                  <div className="text-sm text-orange-100 mt-1">Response within 24 hours</div>
+                </button>
+              )}
             </button>
           </div>
-        </div>
+        </form>
 
         {/* Contact Alternative */}
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
