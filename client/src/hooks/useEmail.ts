@@ -30,9 +30,10 @@ export const useEmail = (): UseEmailReturn => {
     setError(null);
     setSuccess(false);
 
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+    // TEMPORARY TEST - Replace the environment variable lines with:
+    const serviceId = "service_n50cudk";
+    const templateId = "template_x1318bp";  
+    const publicKey = "IAnEJueUsJXBGTOiq";
 
     try {
       // Debug: Log the actual values (remove this after testing)
