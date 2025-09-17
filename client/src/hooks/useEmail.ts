@@ -30,16 +30,19 @@ export const useEmail = (): UseEmailReturn => {
     setError(null);
     setSuccess(false);
 
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
     try {
       // Debug: Log the actual values (remove this after testing)
-      console.log('Environment Variables:', {
-        serviceId,
-        templateId, 
-        publicKey: publicKey ? publicKey.substring(0, 5) + '...' : 'Missing'
+      console.log('Raw Environment Variables:', {
+        serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        mode: import.meta.env.MODE,
+        allViteVars: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')),
+        allEnvKeys: Object.keys(import.meta.env)
       });
 
       if (!serviceId || !templateId || !publicKey) {
