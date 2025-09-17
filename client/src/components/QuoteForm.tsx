@@ -88,11 +88,14 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted!', formData);
 
     if (!validateForm()) {
+      console.log('Validation failed');
       return;
     }
 
+    console.log('Validation passed, sending email...');
     try {
       const emailParams: EmailTemplateParams = {
         contactName: formData.contactName,
@@ -119,6 +122,7 @@ export default function QuoteForm({ isOpen, onClose }: QuoteFormProps) {
       }, 2000);
     } catch (err) {
       // Error is handled by the useEmail hook
+      console.error('Error submitting form:', err);
     }
   };
 
@@ -389,10 +393,10 @@ Example: 'Need 10 STIHL chainsaws MS 250, 5 cordless drills, safety equipment fo
                   SENDING...
                 </>
               ) : (
-                <button className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors">
+                <>
                   SUBMIT REQUEST
                   <div className="text-sm text-orange-100 mt-1">Response within 24 hours</div>
-                </button>
+                </>
               )}
             </button>
           </div>
